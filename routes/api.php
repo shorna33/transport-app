@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TransportController;
 use App\Http\Controllers\AuthenticationController;
 
 /*
@@ -21,5 +22,13 @@ use App\Http\Controllers\AuthenticationController;
 
 Route::post('/register', [AuthenticationController::class, 'register']);
 Route::post('/login', [AuthenticationController::class, 'login']);
+
+Route::middleware('auth:api')->group(function(){
+    Route::post('/create_transport', [TransportController::class, 'create_transport']);
+    Route::get('/show_transport/{id}', [TransportController::class, 'show_transport']);
+    Route::get('/show_transport', [TransportController::class, 'show_transport']);
+});
+
+
 
 

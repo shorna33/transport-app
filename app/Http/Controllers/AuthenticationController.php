@@ -47,10 +47,10 @@ class AuthenticationController extends Controller
             ]);
         }
 
-        $token = auth()->user()->createToken('API Token')->accessToken;
+        $token = $user->createToken('auth_token')->accessToken;
 
         return response([
-            'user' => auth()->user(),
+            'user' => $user,
             'token' => $token 
         ]);
     }

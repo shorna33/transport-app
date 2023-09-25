@@ -2,64 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Shipment;
 use App\Models\Transport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class TransportController extends Controller
+class ShipmentController extends Controller
 {
-    public function create_transport (Request $request) {
+
+    public function create_shipment (Request $request) {
 
         if (Auth::guard('api')->check()) {
             try {
                 $data = $request->validate([
-                    'name' => 'required|max:255',
-                    'type' => 'required|max:255',
-                    'cost_per_km' => 'required'
+                    'product' => 'required|max:255',
+                    'total_distance' => 'required',
+                    'transport_id' => 'required'
                 ]);
             } catch (\Throwable $th) {
                 return response([
                     'error_message' => 'Validation failed!'
                 ]);
             }
-            
+            $data['user_id'] = Auth::user()->id;
+            $transport = Transport::find($data['transport_id']);
+            $data['total_cost'] = $data['total_distance'] * $transport->cost_per_km;
     
-            $transport = Transport::create($data);
+            $shipment = Shipment::create($data);
     
             return response([
-                'data' => $transport
+                'data' => $shipment
             ]);
         } else {
             return response([
                 'message' => 'Unauthorized'
             ]);
-        }   
+        }
 
         
     }
 
-    public function show_transport($id = null) {
+
+    public function show_shipment($id = null) {
         if (Auth::guard('api')->check()) {
             if ($id !== null) {
                 // This is the case when $id is provided
-                $data = Transport::find($id);
+                $data = Shipment::find($id);
     
                 if ($data) {
                     return response($data, 201);
                 } else {
                     return response([
-                        'message' => 'Transport not found'
+                        'message' => 'Shipment not found'
                     ]);
                 }
             } else {
                 // This is the case when $id is not provided
-                $data = Transport::get();
+                $data = Shipment::get();
     
                 if ($data->count() > 0) {
                     return response($data, 201);
                 } else {
                     return response([
-                        'message' => 'Transport not found'
+                        'message' => 'Shipment not found'
                     ]);
                 }
             }
@@ -69,5 +74,4 @@ class TransportController extends Controller
             ]);
         }        
     }
-    
 }
